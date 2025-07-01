@@ -11,7 +11,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dujar-secret-key-change
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///dujar.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Fix for Railway PostgreSQL URL
+# Fix for Railway/Render PostgreSQL URL
 if app.config['SQLALCHEMY_DATABASE_URI'].startswith('postgres://'):
     app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace('postgres://', 'postgresql://')
 
