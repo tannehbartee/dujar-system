@@ -453,3 +453,13 @@ def facility_events():
             })
     
     return jsonify(allowed_events)
+    @app.route('/init-db')
+def init_database():
+    """Initialize database tables and default data"""
+    try:
+        # Create all tables
+        db.create_all()
+        
+        # Check if admin user exists
+        if not User.query.first():
+            # ... (rest of the code I provided)
