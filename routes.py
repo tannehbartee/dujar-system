@@ -24,6 +24,28 @@ def admin_required(f):
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated_function
+@app.route('/init-db')
+def init_database():
+    """Initialize database tables - run this once"""
+    try:
+        db.drop_all()  # Clear existing tables
+        db.create_all()  # Create fresh tables
+        
+        # Create default admin user
+        admin_password = bcrypt.generate_password_hash('admin123').decode('utf-8')
+        admin = User(
+            username='admin',
+            password_hash=admin_password,
+            role='admin',
+            full_name='System Administrator',
+            email='admin@dujar.com'
+        )
+        db.session.add(admin)
+        db.session.commit()
+        
+        return "Database initialized successfully! <a href='/'>Go to Login</a>"
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 @app.route('/')
 def index():
