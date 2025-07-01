@@ -1,84 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookings - DUJAR</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .sidebar {
-            min-height: 100vh;
-            background-color: #343a40;
-            position: fixed;
-            width: 250px;
-        }
-        .sidebar .nav-link {
-            color: #adb5bd;
-        }
-        .sidebar .nav-link:hover {
-            color: #fff;
-        }
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-        }
-    </style>
-</head>
-<body>
-    <!-- Sidebar -->
-    <nav class="sidebar">
-        <div class="p-3">
-            <h4 class="text-white">DUJAR</h4>
-            <hr class="text-white">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link" href="/dashboard">
-                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/bookings">
-                        <i class="fas fa-calendar-alt me-2"></i>Bookings
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/customers">
-                        <i class="fas fa-users me-2"></i>Customers
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/logout">
-                        <i class="fas fa-sign-out-alt me-2"></i>Logout
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+{% extends "base.html" %}
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="container-fluid">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>Bookings</h1>
-                <button class="btn btn-primary">
-                    <i class="fas fa-plus me-1"></i>New Booking
-                </button>
-            </div>
-            
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-center py-4">
-                        <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
-                        <h4>No bookings found</h4>
-                        <p class="text-muted">Start by creating your first booking.</p>
-                        <button class="btn btn-primary">Create Booking</button>
-                    </div>
-                </div>
-            </div>
+{% block page_title %}Bookings{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Bookings</h2>
+    <a href="{{ url_for('new_booking') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i>New Booking
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if bookings and bookings.items %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Facility</th>
+                        <th>Event</th>
+                        <th>Total Fee</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings.items %}
+                    <tr>
+                        <td>{{ booking.id }}</td>
+                        <td>{{ booking.booking_date.strftime('%Y-%m-%d') if booking.booking_date else '-' }}</td>
+                        <td>{{ booking.customer.name if booking.customer else '-' }}</td>
+                        <td>{{ booking.facility.name if booking.facility else '-' }}</td>
+                        <td>{{ booking.event.name if booking.event else '-' }}</td>
+                        <td>${{ "%.2f"|format(booking.total_fee_usd) if booking.total_fee_usd else '0.00' }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'success' if booking.payment_status == 'complete' else 'warning' if booking.payment_status == 'partial' else 'danger' }}">
+                                {{ booking.payment_status|title if booking.payment_status else 'Pending' }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+            <h4>No bookings found</h4>
+            <p class="text-muted">Start by creating your first booking.</p>
+            <a href="{{ url_for('new_booking') }}" class="btn btn-primary">Create Booking</a>
+        </div>
+        {% endif %}
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}
